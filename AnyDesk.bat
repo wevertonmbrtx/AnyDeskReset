@@ -4,6 +4,8 @@ title AnyDesk
 mode con:cols=83 lines=27
 chcp 437 >nul
 
+echo.
+echo.
 echo                             @                 @@@
 echo                           @@@@@             @@@@@@@
 echo                         @@@@@@@@@         @@@@@@@@@@@
@@ -30,7 +32,7 @@ echo                         @@@@@@@@@         @@@@@@@@@@@
 echo                           @@@@@             @@@@@@@
 echo                             @                 @@@
 timeout 2 >nul
-
+cls
 :init
     setlocal EnableExtensions DisableDelayedExpansion
     set cmdInvoke=1
