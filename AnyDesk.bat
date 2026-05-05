@@ -29,7 +29,7 @@ echo                       @@@@@@@@@@@@@         @@@@@@@@@@@
 echo                         @@@@@@@@@         @@@@@@@@@@@
 echo                           @@@@@             @@@@@@@
 echo                             @                 @@@
-timeout 1 >nul
+timeout 2 >nul
 
 :init
     setlocal EnableExtensions DisableDelayedExpansion
