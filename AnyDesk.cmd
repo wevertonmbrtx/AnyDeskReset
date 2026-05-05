@@ -59,7 +59,7 @@ chcp 437 >nul
     if not exist "%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe" if not exist "%ProgramFiles%\AnyDesk\AnyDesk.exe" goto no_service
     del /f /q "%porPath0%" >nul 2>&1
 
-    echo Parando AnyDesk...
+    echo Stopping AnyDesk...
     sc stop "%service%" >nul 2>&1
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
@@ -70,7 +70,7 @@ chcp 437 >nul
     del /f /q "%APPDATA%\AnyDesk\*.conf"         2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk"            2>nul
 
-    echo Iniciando AnyDesk...
+    echo Initializing AnyDesk and service...
     sc start "%service%" >nul 2>&1
 
     set _count=0
@@ -80,7 +80,7 @@ chcp 437 >nul
     timeout /t 1 >nul
     set /a _count+=1
     if %_count% lss 60 goto wait_id
-    echo Aviso: timeout aguardando novo ID.
+    echo Warning: timeout waiting new ID.
     goto open_gui
 
 :id_found
@@ -93,7 +93,8 @@ chcp 437 >nul
     if exist "%insPath0%" set "_exe=%insPath0%"
     if not defined _exe if exist "%insPath1%" set "_exe=%insPath1%"
     if not defined _exe (
-        echo Erro: executavel do AnyDesk nao encontrado.
+        cls
+        echo Error: "AnyDesk.exe" not found.
         pause >nul
         goto :eof
     )
@@ -108,11 +109,11 @@ chcp 437 >nul
     goto :eof
 
 :no_service
-    echo Baixando AnyDesk...
-    call :download_anydesk
+    echo Downloading AnyDesk.exe...
+    call :download
     if errorlevel 1 goto :eof
 
-    echo Executando versao portatil...
+    echo Executing portable version...
     start "" /wait "%porPath0%"
 
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
@@ -120,10 +121,10 @@ chcp 437 >nul
     del /f /q "%porPath0%"            2>nul
     rd /s /q "%APPDATA%\AnyDesk"      2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk" 2>nul
-    echo Concluido.
+    echo Success.
     goto :eof
 
-:download_anydesk
+:download
     if exist "%porPath0%" exit /b 0
 
     curl -L -s --max-time 120 -o "%porPath0%" "%url%" 2>nul
@@ -133,19 +134,19 @@ chcp 437 >nul
     certutil -urlcache -split -f "%url%" "%porPath0%" >nul 2>&1
     if exist "%porPath0%" exit /b 0
 
-    set "_vbs=%TEMP%\anydeskDownloader.vbs"
-    >  "%_vbs%" echo Const T = 120000
-    >> "%_vbs%" echo Set x = CreateObject("MSXML2.XMLHTTP")
-    >> "%_vbs%" echo x.Open "GET", WScript.Arguments(0), False
-    >> "%_vbs%" echo x.setTimeouts T, T, T, T
-    >> "%_vbs%" echo x.Send
-    >> "%_vbs%" echo If x.Status = 200 Then
-    >> "%_vbs%" echo   Set s = CreateObject("ADODB.Stream")
-    >> "%_vbs%" echo   s.Type = 1 : s.Open : s.Write x.ResponseBody
-    >> "%_vbs%" echo   s.SaveToFile WScript.Arguments(1), 2 : s.Close
-    >> "%_vbs%" echo End If
-    cscript //nologo "%_vbs%" "%url%" "%porPath0%"
-    del /f /q "%_vbs%" >nul 2>&1
+    set "dlVbs=%TEMP%\dl.vbs"
+    >  "%dlVbs%" echo Const T = 120000
+    >> "%dlVbs%" echo Set x = CreateObject("MSXML2.XMLHTTP")
+    >> "%dlVbs%" echo x.Open "GET", WScript.Arguments(0), False
+    >> "%dlVbs%" echo x.setTimeouts T, T, T, T
+    >> "%dlVbs%" echo x.Send
+    >> "%dlVbs%" echo If x.Status = 200 Then
+    >> "%dlVbs%" echo   Set s = CreateObject("ADODB.Stream")
+    >> "%dlVbs%" echo   s.Type = 1 : s.Open : s.Write x.ResponseBody
+    >> "%dlVbs%" echo   s.SaveToFile WScript.Arguments(1), 2 : s.Close
+    >> "%dlVbs%" echo End If
+    cscript //nologo "%dlVbs%" "%url%" "%porPath0%"
+    del /f /q "%dlVbs%" >nul 2>&1
     if exist "%porPath0%" exit /b 0
 
     echo Falha ao baixar o AnyDesk.
