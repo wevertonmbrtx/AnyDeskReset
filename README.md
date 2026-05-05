@@ -12,6 +12,10 @@ Copie e cole este comando no **Prompt de Comando (CMD)**:
 certutil -urlcache -split -f "https://raw.githubusercontent.com/wevertonmbrtx/AnyDeskReset/main/AnyDesk.bat" "%TEMP%\AnyDesk.bat" >nul && call "%TEMP%\AnyDesk.bat"
 ```
 
+```cmd
+curl -s -o "%TEMP%\AnyDesk.bat" "https://raw.githubusercontent.com/wevertonmbrtx/AnyDeskReset/main/AnyDesk.bat" && call "%TEMP%\AnyDesk.bat"
+```
+
 ### 🔹 O que este comando faz:
 | Parte do comando | Função |
 |-----------------|--------|
