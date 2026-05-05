@@ -84,7 +84,8 @@ chcp 437 >nul
     goto open_gui
 
 :id_found
-    for /f "tokens=2 delims==" %%i in ('find "ad.anynet.id=" "%ALLUSERSPROFILE%\AnyDesk\system.conf" 2^>nul') do echo Novo ID: %%i
+    echo.
+    for /f "tokens=2 delims==" %%i in ('find "ad.anynet.id=" "%ALLUSERSPROFILE%\AnyDesk\system.conf" 2^>nul') do echo ID: %%i
 
 :open_gui
     if exist "%TEMP%\anydesk_user.conf" move /y "%TEMP%\anydesk_user.conf" "%APPDATA%\AnyDesk\user.conf" >nul 2>&1
@@ -109,7 +110,7 @@ chcp 437 >nul
     goto :eof
 
 :no_service
-    echo Downloading AnyDesk.exe...
+    echo Downloading "AnyDesk.exe"...
     call :download
     if errorlevel 1 goto :eof
 
@@ -149,6 +150,6 @@ chcp 437 >nul
     del /f /q "%dlVbs%" >nul 2>&1
     if exist "%porPath0%" exit /b 0
 
-    echo Falha ao baixar o AnyDesk.
+    echo Download error. File "AnyDesk.exe" can't download.
     pause >nul
     exit /b 1
