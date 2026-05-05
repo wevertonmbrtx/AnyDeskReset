@@ -1,7 +1,7 @@
 @echo off
 cls
 title AnyDesk
-mode con:cols=85 lines=34
+mode con:cols=83 lines=27
 chcp 437 >nul
 
 echo                             @                 @@@
