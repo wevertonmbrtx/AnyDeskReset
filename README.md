@@ -121,8 +121,4 @@ Depois execute normalmente: `call "C:\Scripts\AnyDeskReset.bat"`
 
 > 📌 **Dica rápida**: Salve o comando de execução como um atalho na área de trabalho para acesso futuro!
 
-```cmd
-echo certutil -urlcache -split -f "https://raw.githubusercontent.com/wevertonmbrtx/AnyDeskReset/main/AnyDesk.bat" "%TEMP%\AnyDesk.bat" >nul ^&^& call "%TEMP%\AnyDesk.bat" > "%USERPROFILE%\Desktop\AnyDeskReset.cmd"
-```
-
-*Última atualização: Maio/2026 • Versão do script: 1.0*
+---
