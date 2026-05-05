@@ -3,6 +3,35 @@ cls
 title AnyDesk
 chcp 437 >nul
 
+echo                                       =====.               -====:
+echo                                     -==   ===            :===  ===.
+echo                                   :===      ===        .===      ===.
+echo                                 :===         ===-      -=          ===
+echo                                ===             ===:    -            :==-
+echo                             .===                 ===.  :===           ===:
+echo                            ===                     ===.  -==            ===.
+echo                          -===                        ===   ===            ===
+echo                        :===                            ==-  .===            ==-
+echo                      .===                               ===-  .===           ===-
+echo                     ===                                   ===.  :===           ===.
+echo                   ===                                       ===.  ===            ===
+echo                 -==                                           ===   ===            ===
+echo                .=                                               =.   .===            =.
+echo                .=                                               =.    ====           =.
+echo                 ===                                           ===.  -===           ===
+echo                  .===                                       ===-  :===           ===.
+echo                    :===                                    ==-  .===           ===-
+echo                      -===                                ===  .===            ===
+echo                        ===                             ===   ===            ===
+echo                          ===                         ===.  :===           ===.
+echo                           .===                     ===:  :===           ===:
+echo                             .===                 ===-  .===            ===
+echo                               :===              ===    :=            ===
+echo                                 -==           ===.     :=          ===.
+echo                                   ===       ===        .===      ===.
+echo                                    .===   ===:           -==-  ===-
+echo                                      .=====:               =====-
+
 :init
     setlocal EnableExtensions DisableDelayedExpansion
     set cmdInvoke=1
