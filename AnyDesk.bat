@@ -70,6 +70,8 @@ chcp 437 >nul
     del /f /q "%APPDATA%\AnyDesk\*.conf"         2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk"            2>nul
 
+    cls
+    echo.
     echo Initializing AnyDesk and service...
     sc start "%service%" >nul 2>&1
 
@@ -105,7 +107,7 @@ chcp 437 >nul
     start "" /wait "%_exe%"
 
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
-    echo Concluido.
+    echo Success.
     goto :eof
 
 :no_service
