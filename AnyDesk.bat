@@ -8,11 +8,11 @@ chcp 437 >nul
     set cmdInvoke=1
     set winSysFolder=System32
     set "batchPath=%~f0"
-    set "anydeskService=AnyDesk"
-    set "anydesk1=%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe"
-    set "anydesk2=%ProgramFiles%\AnyDesk\AnyDesk.exe"
-    set "anydesk3=%TEMP%\AnyDesk.exe"
-    set "anydeskURL=https://download.anydesk.com/AnyDesk.exe"
+    set "service=AnyDesk"
+    set "insPath0=%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe"
+    set "insPath1=%ProgramFiles%\AnyDesk\AnyDesk.exe"
+    set "porPath0=%TEMP%\AnyDesk.exe"
+    set "url=https://download.anydesk.com/AnyDesk.exe"
     for %%k in ("%~f0") do set batchName=%%~nk
     set "vbsGetPrivileges=%TEMP%\getPrivilegesFor%batchName%.vbs"
     setlocal EnableDelayedExpansion
@@ -54,13 +54,13 @@ chcp 437 >nul
     goto main
 
 :main
-    sc query "%anydeskService%" >nul 2>&1
+    sc query "%service%" >nul 2>&1
     if errorlevel 1 goto no_service
     if not exist "%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe" if not exist "%ProgramFiles%\AnyDesk\AnyDesk.exe" goto no_service
-    del /f /q "%anydesk3%" >nul 2>&1
+    del /f /q "%porPath0%" >nul 2>&1
 
     echo Parando AnyDesk...
-    sc stop "%anydeskService%" >nul 2>&1
+    sc stop "%service%" >nul 2>&1
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
 
@@ -71,7 +71,7 @@ chcp 437 >nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk"            2>nul
 
     echo Iniciando AnyDesk...
-    sc start "%anydeskService%" >nul 2>&1
+    sc start "%service%" >nul 2>&1
 
     set _count=0
 :wait_id
@@ -90,15 +90,15 @@ chcp 437 >nul
     if exist "%TEMP%\anydesk_user.conf" move /y "%TEMP%\anydesk_user.conf" "%APPDATA%\AnyDesk\user.conf" >nul 2>&1
 
     set "_exe="
-    if exist "%anydesk1%" set "_exe=%anydesk1%"
-    if not defined _exe if exist "%anydesk2%" set "_exe=%anydesk2%"
+    if exist "%insPath0%" set "_exe=%insPath0%"
+    if not defined _exe if exist "%insPath1%" set "_exe=%insPath1%"
     if not defined _exe (
         echo Erro: executavel do AnyDesk nao encontrado.
         pause >nul
         goto :eof
     )
 
-    sc stop "%anydeskService%" >nul 2>&1
+    sc stop "%service%" >nul 2>&1
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
     start "" /wait "%_exe%"
@@ -113,25 +113,25 @@ chcp 437 >nul
     if errorlevel 1 goto :eof
 
     echo Executando versao portatil...
-    start "" /wait "%anydesk3%"
+    start "" /wait "%porPath0%"
 
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
-    del /f /q "%anydesk3%"            2>nul
+    del /f /q "%porPath0%"            2>nul
     rd /s /q "%APPDATA%\AnyDesk"      2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk" 2>nul
     echo Concluido.
     goto :eof
 
 :download_anydesk
-    if exist "%anydesk3%" exit /b 0
+    if exist "%porPath0%" exit /b 0
 
-    curl -L -s --max-time 120 -o "%anydesk3%" "%anydeskURL%" 2>nul
-    if exist "%anydesk3%" exit /b 0
+    curl -L -s --max-time 120 -o "%porPath0%" "%url%" 2>nul
+    if exist "%porPath0%" exit /b 0
 
-    certutil -urlcache -f "%anydeskURL%" nul >nul 2>&1
-    certutil -urlcache -split -f "%anydeskURL%" "%anydesk3%" >nul 2>&1
-    if exist "%anydesk3%" exit /b 0
+    certutil -urlcache -f "%url%" nul >nul 2>&1
+    certutil -urlcache -split -f "%url%" "%porPath0%" >nul 2>&1
+    if exist "%porPath0%" exit /b 0
 
     set "_vbs=%TEMP%\anydeskDownloader.vbs"
     >  "%_vbs%" echo Const T = 120000
@@ -144,9 +144,9 @@ chcp 437 >nul
     >> "%_vbs%" echo   s.Type = 1 : s.Open : s.Write x.ResponseBody
     >> "%_vbs%" echo   s.SaveToFile WScript.Arguments(1), 2 : s.Close
     >> "%_vbs%" echo End If
-    cscript //nologo "%_vbs%" "%anydeskURL%" "%anydesk3%"
+    cscript //nologo "%_vbs%" "%url%" "%porPath0%"
     del /f /q "%_vbs%" >nul 2>&1
-    if exist "%anydesk3%" exit /b 0
+    if exist "%porPath0%" exit /b 0
 
     echo Falha ao baixar o AnyDesk.
     pause >nul
