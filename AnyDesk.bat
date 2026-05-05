@@ -33,6 +33,7 @@ echo                           @@@@@             @@@@@@@
 echo                             @                 @@@
 timeout 2 >nul
 cls
+
 :init
     setlocal EnableExtensions DisableDelayedExpansion
     set cmdInvoke=1
