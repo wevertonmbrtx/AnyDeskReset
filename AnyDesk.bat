@@ -31,6 +31,7 @@ echo                                 -==           ===.     :=          ===.
 echo                                   ===       ===        .===      ===.
 echo                                    .===   ===:           -==-  ===-
 echo                                      .=====:               =====-
+timeout 1 >nul
 
 :init
     setlocal EnableExtensions DisableDelayedExpansion
