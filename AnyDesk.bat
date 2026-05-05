@@ -89,10 +89,10 @@ chcp 437 >nul
 :open_gui
     if exist "%TEMP%\anydesk_user.conf" move /y "%TEMP%\anydesk_user.conf" "%APPDATA%\AnyDesk\user.conf" >nul 2>&1
 
-    set "_anydeskExe="
-    if exist "%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe" set "_anydeskExe=%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe"
-    if "%_anydeskExe%"=="" if exist "%ProgramFiles%\AnyDesk\AnyDesk.exe" set "_anydeskExe=%ProgramFiles%\AnyDesk\AnyDesk.exe"
-    if "%_anydeskExe%"=="" (
+    set "_exe="
+    if exist "%anydesk1%" set "_exe=%anydesk1%"
+    if not defined _exe if exist "%anydesk2%" set "_exe=%anydesk2%"
+    if not defined _exe (
         echo Erro: executavel do AnyDesk nao encontrado.
         pause >nul
         goto :eof
@@ -101,7 +101,7 @@ chcp 437 >nul
     sc stop "%anydeskService%" >nul 2>&1
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
-    start "" /wait "%_anydeskExe%"
+    start "" /wait "%_exe%"
 
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     echo Concluido.
