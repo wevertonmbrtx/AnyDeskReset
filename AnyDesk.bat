@@ -14,7 +14,7 @@ chcp 437 >nul
     set "anydesk3=%TEMP%\AnyDesk.exe"
     set "anydeskURL=https://download.anydesk.com/AnyDesk.exe"
     for %%k in ("%~f0") do set batchName=%%~nk
-    set "vbsGetPrivileges=%TEMP%\getPrivilegesForAnyDesk_%batchName%.vbs"
+    set "vbsGetPrivileges=%TEMP%\getPrivileges_%batchName%.vbs"
     setlocal EnableDelayedExpansion
 
 :check_privileges
