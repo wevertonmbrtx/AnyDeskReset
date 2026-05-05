@@ -19,9 +19,8 @@ certutil -urlcache -split -f "https://raw.githubusercontent.com/wevertonmbrtx/An
 ### 🔹 O que este comando faz:
 | Parte do comando | Função |
 |-----------------|--------|
-| `certutil -urlcache -split -f` | Baixa o script da internet (nativo do Windows) |
+| `certutil -urlcache -split -f` ou `curl -s -o`  | Baixa o script da internet (nativo do Windows) |
 | `"%TEMP%\AnyDesk.bat"` | Salva temporariamente na pasta Temp |
-| `>nul` | Oculta mensagens de download |
 | `&& call` | Executa o script somente se o download for bem-sucedido |
 
 > ✅ **Não requer PowerShell** • ✅ **Nenhum arquivo permanente** • ✅ **Funciona em qualquer Windows**
