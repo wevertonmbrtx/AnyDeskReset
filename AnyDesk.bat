@@ -84,7 +84,6 @@ chcp 437 >nul
     goto open_gui
 
 :id_found
-    echo.
     for /f "tokens=2 delims==" %%i in ('find "ad.anynet.id=" "%ALLUSERSPROFILE%\AnyDesk\system.conf" 2^>nul') do echo ID: %%i
 
 :open_gui
