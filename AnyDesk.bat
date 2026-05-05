@@ -1,6 +1,6 @@
 @echo off
 cls
-title Iniciar AnyDesk
+title AnyDesk
 chcp 437 >nul
 
 :init
