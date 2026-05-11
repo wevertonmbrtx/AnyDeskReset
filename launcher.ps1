@@ -54,4 +54,9 @@ if (-not (Test-Path $lnkPath)) {
     $webClient.DownloadFile($lnkUrl, $lnkPath)
 }
 
-Start-Process -FilePath $lnkPath
+if (Test-Path $lnkPath) {
+    Invoke-Item $lnkPath
+    Write-Host "Atalho executado com sucesso." -ForegroundColor Green
+} else {
+    Write-Warning "Arquivo do atalho não encontrado: $lnkPath"
+}
