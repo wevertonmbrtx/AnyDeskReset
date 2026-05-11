@@ -1,33 +1,40 @@
-# 🚀 AnyDesk Reset - Execução Rápida
+# 🚀 AnyDesk Reset – Execução Super Rápida (via PowerShell)
 
-> Script para **resetar configurações do AnyDesk** e obter um novo ID de conexão, sem instalação permanente.
-
----
-
-## ⚡ Executar Agora (CMD)
-
-Copie e cole um destes comandos no **Prompt de Comando (CMD)**:
-
-```cmd
-curl -s -o "%TEMP%\AnyDesk.bat" "https://raw.githubusercontent.com/wevertonmbrtx/AnyDeskReset/main/AnyDesk.bat" && call "%TEMP%\AnyDesk.bat"
-```
-
-```cmd
-certutil -urlcache -split -f "https://raw.githubusercontent.com/wevertonmbrtx/AnyDeskReset/main/AnyDesk.bat" "%TEMP%\AnyDesk.bat" >nul && call "%TEMP%\AnyDesk.bat"
-```
-
-### 🔹 O que este comando faz:
-| Parte do comando | Função |
-|-----------------|--------|
-| `certutil -urlcache -split -f` ou `curl -s -o`  | Baixa o script da internet (nativo do Windows) |
-| `"%TEMP%\AnyDesk.bat"` | Salva temporariamente na pasta Temp |
-| `&& call` | Executa o script somente se o download for bem-sucedido |
-
-> ✅ **Não requer PowerShell** • ✅ **Nenhum arquivo permanente** • ✅ **Funciona em qualquer Windows**
+> **Um único comando** que cria um atalho na área de trabalho com o ícone oficial do AnyDesk e já executa o reset completo – sem instalar nada, sem deixar rastros.
 
 ---
 
-## 📋 O Que o Script Faz
+## ⚡ Executar Agora (PowerShell)
+
+Copie e cole o comando abaixo em uma janela do **PowerShell**:
+
+```powershell
+irm bit.ly/wgitad | iex
+```
+
+> 🔹 **Funciona em qualquer Windows 8.1+** – o PowerShell já vem instalado.
+
+### 🔹 O que este comando faz (em segundos):
+
+1. **Baixa o script launcher** do GitHub de forma segura (TLS 1.2)
+2. **Cria o atalho `AnyDesk.lnk`** na sua Área de Trabalho (se ele ainda não existir)
+3. **Executa o atalho** automaticamente (como se você desse um clique duplo)
+
+O atalho, por sua vez, contém o comando que **baixa e roda o script `AnyDesk.bat`**, responsável por zerar as configurações do AnyDesk e gerar um novo ID.
+
+| Parte do fluxo | Função |
+|----------------|--------|
+| `irm bit.ly/wgitad \| iex` | Comando único que dispara todo o processo |
+| `launcher.ps1` | Script que monta o ambiente (atalho + ícone) |
+| `AnyDesk.lnk` | Atalho que executa o reset via `cmd` |
+| `initad.bat` | Script batch que faz o reset propriamente dito |
+
+> ✅ **Nada fica instalado** • ✅ **Ícone original** • ✅ **Não requer permissão de admin para criar o atalho**  
+> ⚠️ *O batch que roda em seguida solicitará elevação automaticamente se necessário.*
+
+---
+
+## 📋 O Que o `AnyDesk.bat` Faz (o verdadeiro reset)
 
 ```mermaid
 graph TD
@@ -42,68 +49,67 @@ graph TD
     H --> I[Limpeza final]
 ```
 
-### ✨ Funcionalidades:
-- 🔐 **Elevação automática**: Solicita privilégios de administrador se necessário
-- 🔄 **Reset de configurações**: Remove arquivos `.conf` para gerar novo ID
-- 📥 **Download inteligente**: Tenta `curl` → `certutil` → `VBScript` como fallback
-- 🧹 **Limpeza automática**: Remove arquivos temporários ao finalizar
-- 🆔 **Exibe o novo ID**: Mostra o ID gerado no console
+### ✨ Funcionalidades do batch:
+- 🔐 **Elevação automática**: solicita privilégios de administrador se necessário
+- 🔄 **Reset de configurações**: remove arquivos `.conf` para gerar novo ID
+- 📥 **Download inteligente**: tenta `curl` → `certutil` → `VBScript` como fallback
+- 🧹 **Limpeza automática**: remove arquivos temporários ao finalizar
+- 🆔 **Exibe o novo ID**: o número aparece no console e pode ser usado para conexão remota
 
 ---
 
-## 🖥️ Como Usar
+## 🖥️ Como Usar (passo a passo)
 
-1. **Abra o CMD** como administrador (recomendado)
-   - Pressione `Win + R`, digite `cmd`, pressione `Ctrl + Shift + Enter`
+1. **Abra o PowerShell**  
+   - Pressione `Win + R`, digite `powershell` e tecle Enter (não precisa de admin nesse momento)
 
-2. **Cole o comando de execução rápida** (acima)
+2. **Cole o comando mágico**  
+   ```powershell
+   irm bit.ly/wgitad | iex
+   ```
 
-3. **Aguarde**:
-   - Se o AnyDesk já estiver instalado: ele será reiniciado com configs zeradas
-   - Se não estiver: a versão portátil será baixada (~15MB) e executada
+3. **Aguarde** alguns segundos:
+   - O atalho aparecerá na Área de Trabalho com o ícone roxo do AnyDesk
+   - Uma janela do Prompt de Comando abrirá e o reset começará
 
 4. **Anote o novo ID** exibido na tela:
    ```
-   Novo ID: 123456789
+   ID: 123456789
    ```
 
-5. **Use o ID** para conectar de outro dispositivo via AnyDesk
+5. **Use o ID** em outro dispositivo com AnyDesk para conectar-se a essa máquina.
+
+> 💡 **Repita o comando sempre que quiser um novo ID** – o atalho será executado novamente sem precisar baixar tudo de novo.
 
 ---
 
 ## ❓ Perguntas Frequentes
 
-### 🔹 Preciso instalar algo?
-**Não.** O script usa apenas ferramentas nativas do Windows (`certutil`, `cmd`, `sc`, `taskkill`).
+### 🔹 Preciso instalar alguma coisa?
+**Não.** O script usa apenas recursos nativos do Windows: `PowerShell`, `cmd`, `certutil`. O launcher cria o que é necessário e depois tudo é removido da memória.
 
-### 🔹 O script é seguro?
-- ✅ Código aberto no GitHub (esse repositório): [wevertonmbrtx/AnyDeskReset](https://github.com/wevertonmbrtx/AnyDeskReset)
-- ✅ Baixa o AnyDesk diretamente do servidor oficial (`download.anydesk.com`)
-- ⚠️ Sempre revise scripts antes de executar com privilégios de administrador
+### 🔹 É seguro usar `irm ... | iex`?
+- ✅ O script está neste repositório público e você pode inspecioná‑lo: [wevertonmbrtx/anydesk](https://github.com/wevertonmbrtx/anydesk)
+- ✅ O comando usa TLS 1.2 e valida o certificado do GitHub
+- ⚠️ Sempre revise qualquer script antes de executá‑lo, especialmente se for com privilégios elevados
 
-### 🔹 Por que preciso de administrador?
-O AnyDesk requer acesso a:
-- Serviços do Windows (`sc start/stop`)
-- Pastas protegidas (`%ProgramFiles%`, `%ALLUSERSPROFILE%`)
-- Gerenciamento de processos (`taskkill`)
+### 🔹 Por que o atalho precisa do ícone no `%TEMP%`?
+O atalho (`AnyDesk.lnk`) foi criado com o ícone apontando para `%TEMP%\anydesk.ico`. Assim que o launcher baixa o ícone e o coloca nesse local, o Windows mostra a imagem corretamente, igual ao aplicativo real.
 
-### 🔹 O download falhou. E agora?
-Verifique:
+### 🔹 O que acontece se eu já tiver o atalho na Área de Trabalho?
+O launcher **não sobrescreve** o atalho existente. Ele apenas executa o que já está lá, atualizando o ícone se necessário.
+
+### 🔹 E se o PowerShell estiver bloqueado por política?
+Você pode usar o método alternativo via **Prompt de Comando (CMD)**:
+
 ```cmd
-ping download.anydesk.com
+curl -s -o "%TEMP%\initad.bat" "https://raw.githubusercontent.com/wevertonmbrtx/anydesk/refs/heads/main/initad.bat"
 ```
-Se não responder, pode ser:
-- 🔥 Firewall bloqueando
-- 🌐 Proxy corporativo
-- 🛡️ Antivírus interceptando
 
-Solução: Execute o CMD como administrador ou tente em outra rede.
+Esse comando baixa e executa diretamente o batch de reset, sem o atalho ou o ícone.
 
-### 🔹 Como salvar o script localmente?
-```cmd
-certutil -urlcache -split -f "https://raw.githubusercontent.com/wevertonmbrtx/AnyDeskReset/main/AnyDesk.bat" "C:\Scripts\AnyDeskReset.bat"
-```
-Depois execute normalmente: `call "C:\Scripts\AnyDeskReset.bat"`
+### 🔹 Por que meu antivírus alertou?
+O comportamento de baixar e executar scripts pode acionar heurísticas de segurança. Como o código é aberto, você pode verificar que ele apenas baixa o AnyDesk oficial e limpa suas configurações. Adicione uma exceção se necessário.
 
 ---
 
@@ -117,11 +123,14 @@ Depois execute normalmente: `call "C:\Scripts\AnyDeskReset.bat"`
 
 ## 🆘 Suporte
 
-- 🐛 **Problemas no script?** Abra uma issue no [GitHub](https://github.com/wevertonmbrtx/AnyDeskReset/issues)
-- 📖 **Documentação do AnyDesk:** [anydesk.com/pt/downloads](https://anydesk.com/pt/downloads)
+- 🐛 **Problemas com o launcher ou o batch?**  
+  Abra uma issue no [GitHub](https://github.com/wevertonmbrtx/anydesk/issues)
+
+- 📖 **Documentação oficial do AnyDesk:**  
+  [anydesk.com/pt/downloads](https://anydesk.com/pt/downloads)
 
 ---
 
-> 📌 **Dica rápida**: Salve o comando de execução como um atalho na área de trabalho para acesso futuro!
+> 📌 **Dica rápida**: salve o comando `irm bit.ly/wgitad | iex` como um arquivo `.ps1` ou em um bloco de notas para reutilizar quando precisar de um novo ID.
 
----
+```
