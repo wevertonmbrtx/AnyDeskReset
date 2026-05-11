@@ -66,20 +66,36 @@ if (Test-Path $lnkPath) {
     }
 
     if ($appeared) {
-        $idleChecks = 0
-        while ($idleChecks -lt 3) {
-            $running = Get-CimInstance Win32_Process -Filter "Name='cmd.exe'" -ErrorAction SilentlyContinue |
-                Where-Object { $_.CommandLine -like '*initad.bat*' }
-            if ($running) { $idleChecks = 0 } else { $idleChecks++ }
+        $presentStreak = 0
+        $phase1Deadline = (Get-Date).AddMinutes(5)
+        while ((Get-Date) -lt $phase1Deadline -and $presentStreak -lt 3) {
+            if (Get-Process -Name 'AnyDesk' -ErrorAction SilentlyContinue) {
+                $presentStreak++
+            } else {
+                $presentStreak = 0
+            }
             Start-Sleep -Seconds 2
         }
 
-        for ($i = 0; $i -lt 5; $i++) {
+        $absentStreak = 0
+        while ($absentStreak -lt 3) {
+            if (Get-Process -Name 'AnyDesk' -ErrorAction SilentlyContinue) {
+                $absentStreak = 0
+            } else {
+                $absentStreak++
+            }
+            Start-Sleep -Seconds 2
+        }
+
+        Start-Sleep -Seconds 3
+
+        for ($i = 0; $i -lt 30; $i++) {
+            if (-not (Test-Path $batPath)) { break }
             try {
                 Remove-Item $batPath -Force -ErrorAction Stop
                 break
             } catch {
-                Start-Sleep -Seconds 1
+                Start-Sleep -Seconds 2
             }
         }
     }
