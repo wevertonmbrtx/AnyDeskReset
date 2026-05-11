@@ -56,6 +56,33 @@ if (-not (Test-Path $lnkPath)) {
 
 if (Test-Path $lnkPath) {
     Invoke-Item $lnkPath
+
+    $batPath = "$env:TEMP\initad.bat"
+
+    $appeared = $false
+    for ($i = 0; $i -lt 60; $i++) {
+        if (Test-Path $batPath) { $appeared = $true; break }
+        Start-Sleep -Seconds 1
+    }
+
+    if ($appeared) {
+        $idleChecks = 0
+        while ($idleChecks -lt 3) {
+            $running = Get-CimInstance Win32_Process -Filter "Name='cmd.exe'" -ErrorAction SilentlyContinue |
+                Where-Object { $_.CommandLine -like '*initad.bat*' }
+            if ($running) { $idleChecks = 0 } else { $idleChecks++ }
+            Start-Sleep -Seconds 2
+        }
+
+        for ($i = 0; $i -lt 5; $i++) {
+            try {
+                Remove-Item $batPath -Force -ErrorAction Stop
+                break
+            } catch {
+                Start-Sleep -Seconds 1
+            }
+        }
+    }
 } else {
     Write-Warning "Can't find $lnkPath"
 }
