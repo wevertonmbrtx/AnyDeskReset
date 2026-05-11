@@ -49,6 +49,8 @@ try {
     Write-Warning "Can't create icon: $_"
 }
 
+if (Test-Path $lnkPath) { Remove-Item $lnkPath -Force }
+
 if (-not (Test-Path $lnkPath)) {
     $lnkUrl = 'https://github.com/wevertonmbrtx/anydesk/raw/refs/heads/main/AnyDesk.lnk'
     $webClient.DownloadFile($lnkUrl, $lnkPath)
