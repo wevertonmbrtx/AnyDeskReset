@@ -45,7 +45,7 @@ cls
     set "porPath0=%TEMP%\AnyDesk.exe"
     set "url=https://download.anydesk.com/AnyDesk.exe"
     for %%k in ("%~f0") do set batchName=%%~nk
-    set "vbsGetPrivileges=%TEMP%\getPrivilegesFor%batchName%.vbs"
+    set "elevScript=%TEMP%\elev_%batchName%.vbs"
     setlocal EnableDelayedExpansion
 
 :check_privileges
@@ -58,30 +58,30 @@ cls
 
 :get_privileges
     if "%~1"=="ELEV" (echo ELEV & shift /1 & goto got_privileges)
-    echo Set UAC = CreateObject^("Shell.Application"^) > "%vbsGetPrivileges%"
-    echo args = "ELEV " >> "%vbsGetPrivileges%"
-    echo For Each strArg in WScript.Arguments >> "%vbsGetPrivileges%"
-    echo args = args ^& strArg ^& " " >> "%vbsGetPrivileges%"
-    echo Next >> "%vbsGetPrivileges%"
+    echo Set UAC = CreateObject^("Shell.Application"^) > "%elevScript%"
+    echo args = "ELEV " >> "%elevScript%"
+    echo For Each strArg in WScript.Arguments >> "%elevScript%"
+    echo args = args ^& strArg ^& " " >> "%elevScript%"
+    echo Next >> "%elevScript%"
 
     if "%cmdInvoke%"=="1" goto invoke_cmd
 
-    echo UAC.ShellExecute "!batchPath!", args, "", "runas", 2 >> "%vbsGetPrivileges%"
+    echo UAC.ShellExecute "!batchPath!", args, "", "runas", 2 >> "%elevScript%"
     goto exec_elevation
 
 :invoke_cmd
-    echo args = "/c """ + "!batchPath!" + """ " + args >> "%vbsGetPrivileges%"
-    echo UAC.ShellExecute "%SystemRoot%\%winSysFolder%\cmd.exe", args, "", "runas", 2 >> "%vbsGetPrivileges%"
+    echo args = "/c """ + "!batchPath!" + """ " + args >> "%elevScript%"
+    echo UAC.ShellExecute "%SystemRoot%\%winSysFolder%\cmd.exe", args, "", "runas", 2 >> "%elevScript%"
 
 :exec_elevation
-    "%SystemRoot%\%winSysFolder%\WScript.exe" "%vbsGetPrivileges%" %*
+    "%SystemRoot%\%winSysFolder%\WScript.exe" "%elevScript%" %*
     exit /B
 
 :got_privileges
     endlocal
     setlocal
     cd /d "%~dp0"
-    if "%~1"=="ELEV" (del "%vbsGetPrivileges%" 1>nul 2>nul & shift /1)
+    if "%~1"=="ELEV" (del "%elevScript%" 1>nul 2>nul & shift /1)
     goto main
 
 :main

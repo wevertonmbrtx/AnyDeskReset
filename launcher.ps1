@@ -87,7 +87,7 @@ if (Test-Path $lnkPath) {
             Start-Sleep -Seconds 2
         }
 
-        Start-Sleep -Seconds 3
+        Start-Sleep -Seconds 2
 
         for ($i = 0; $i -lt 30; $i++) {
             if (-not (Test-Path $batPath)) { break }
