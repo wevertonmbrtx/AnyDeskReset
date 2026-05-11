@@ -103,8 +103,7 @@ cls
     rd /s /q "%LOCALAPPDATA%\AnyDesk"            2>nul
 
     cls
-    echo.
-    echo Initializing AnyDesk and service...
+    echo Initializing AnyDesk...
     sc start "%service%" >nul 2>&1
 
     set _count=0
