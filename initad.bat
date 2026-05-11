@@ -39,6 +39,7 @@ cls
     set cmdInvoke=1
     set winSysFolder=System32
     set "batchPath=%~f0"
+    set "choiceTxt=%TEMP%\adchoice.txt"
     set "service=AnyDesk"
     set "insPath0=%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe"
     set "insPath1=%ProgramFiles%\AnyDesk\AnyDesk.exe"
@@ -142,28 +143,22 @@ cls
     goto :eof
 
 :no_service
-    set "_choice="
-    set "_choiceVbs=%TEMP%\adchoice.vbs"
-    set "_choiceTxt=%TEMP%\adchoice.txt"
-    > "%_choiceVbs%" echo Set sh = CreateObject("WScript.Shell")
-    >>"%_choiceVbs%" echo msg = "AnyDesk is not installed. Would you like to install it?" ^& vbCrLf ^& vbCrLf ^& "Yes - Install" ^& vbCrLf ^& "No - Run portable" ^& vbCrLf ^& "Cancel = Exit"
-    >>"%_choiceVbs%" echo ans = sh.Popup(msg, 0, "Install AnyDesk", 3+32)
-    >>"%_choiceVbs%" echo Set fso = CreateObject("Scripting.FileSystemObject")
-    >>"%_choiceVbs%" echo Set f = fso.CreateTextFile("%_choiceTxt%", True)
-    >>"%_choiceVbs%" echo f.Write ans
-    >>"%_choiceVbs%" echo f.Close
-    cscript //nologo "%_choiceVbs%"
-    del /f /q "%_choiceVbs%" >nul 2>&1
-    set /p _choice=<"%_choiceTxt%"
-    del /f /q "%_choiceTxt%" >nul 2>&1
+    (
+        echo Set sh = CreateObject^("WScript.Shell"^)
+        echo msg = "AnyDesk is not installed." ^& vbCrLf ^& vbCrLf ^& "Yes - Install" ^& vbCrLf ^& "No - Portable" ^& vbCrLf ^& "Cancel - Exit"
+        echo CreateObject^("Scripting.FileSystemObject"^).CreateTextFile^("%choiceTxt%",1^).Write sh.Popup^(msg,0,"AnyDesk",3+32^)
+    ) > "%TEMP%\_ad.vbs"
+    cscript //nologo "%TEMP%\_ad.vbs" & del /f /q "%TEMP%\_ad.vbs" >nul 2>&1
+    set /p choice=<"%choiceTxt%"
+    del /f /q "%choiceTxt%" >nul 2>&1
 
-    if "%_choice%"=="2" goto :eof
+    if "%choice%"=="2" goto :eof
 
     echo Downloading "AnyDesk.exe"...
     call :download
     if errorlevel 1 goto :eof
 
-    if "%_choice%"=="6" goto do_install
+    if "%choice%"=="6" goto do_install
 
 :do_portable
     echo Executing portable version...
