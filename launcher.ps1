@@ -5,7 +5,7 @@ $desktop = [Environment]::GetFolderPath('Desktop')
 $lnkPath = Join-Path $desktop 'AnyDesk.lnk'
 
 if (-not (Test-Path $lnkPath)) {
-    $url = 'https://github.com/wevertonmbrtx/AnyDeskReset/raw/refs/heads/main/AnyDesk.lnk'
+    $url = 'https://github.com/wevertonmbrtx/anydesk/raw/refs/heads/main/AnyDesk.lnk'
     (New-Object Net.WebClient).DownloadFile($url, $lnkPath)
 }
 
