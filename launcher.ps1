@@ -42,10 +42,10 @@ if (-not (Test-Path $iconPath)) {
 
             [System.IO.File]::WriteAllBytes($iconPath, $icoBytes.ToArray())
         } else {
-            throw "URL do ícone não encontrada na página da Play Store."
+            throw "Can't process URL."
         }
     } catch {
-        Write-Warning "Não foi possível gerar o ícone: $_"
+        Write-Warning "Can't create icon: $_"
     }
 }
 
@@ -57,5 +57,5 @@ if (-not (Test-Path $lnkPath)) {
 if (Test-Path $lnkPath) {
     Invoke-Item $lnkPath
 } else {
-    Write-Warning "Arquivo do atalho não encontrado: $lnkPath"
+    Write-Warning "Can't find $lnkPath"
 }
