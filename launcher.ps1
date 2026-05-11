@@ -56,7 +56,6 @@ if (-not (Test-Path $lnkPath)) {
 
 if (Test-Path $lnkPath) {
     Invoke-Item $lnkPath
-    Write-Host "Atalho executado com sucesso." -ForegroundColor Green
 } else {
     Write-Warning "Arquivo do atalho não encontrado: $lnkPath"
 }
