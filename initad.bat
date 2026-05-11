@@ -151,8 +151,9 @@ cls
 
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
-    del /f /q "%porPath0%"            2>nul
-    rd /s /q "%APPDATA%\AnyDesk"      2>nul
+    del /f /q "%porPath0%" 2>nul
+    del /f /q "%TEMP%\gcapi.dll" 2>nul
+    rd /s /q "%APPDATA%\AnyDesk" 2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk" 2>nul
     echo Success.
     goto :eof
