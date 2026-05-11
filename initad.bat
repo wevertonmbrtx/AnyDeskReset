@@ -146,10 +146,10 @@ cls
     set "_choiceVbs=%TEMP%\adchoice.vbs"
     set "_choiceTxt=%TEMP%\adchoice.txt"
     > "%_choiceVbs%" echo Set sh = CreateObject("WScript.Shell")
-    >>"%_choiceVbs%" echo ans = sh.Popup("AnyDesk is not installed." & Chr(13) & Chr(13) & "How do you want to proceed?", 0, "AnyDesk", 3+32)
-    >>"%_choiceVbs%" echo ' ans: 6=Yes(Install) 7=No(Portable) 2=Cancel
-    >>"%_choiceVbs%" echo Dim fso : Set fso = CreateObject("Scripting.FileSystemObject")
-    >>"%_choiceVbs%" echo Dim f   : Set f   = fso.CreateTextFile("%_choiceTxt%", True)
+    >>"%_choiceVbs%" echo msg = "AnyDesk is not installed." ^& vbCrLf ^& vbCrLf ^& "Yes    = Install" ^& vbCrLf ^& "No     = Run portable (ID reset only)" ^& vbCrLf ^& "Cancel = Exit"
+    >>"%_choiceVbs%" echo ans = sh.Popup(msg, 0, "AnyDesk", 3+32)
+    >>"%_choiceVbs%" echo Set fso = CreateObject("Scripting.FileSystemObject")
+    >>"%_choiceVbs%" echo Set f = fso.CreateTextFile("%_choiceTxt%", True)
     >>"%_choiceVbs%" echo f.Write ans
     >>"%_choiceVbs%" echo f.Close
     cscript //nologo "%_choiceVbs%"
