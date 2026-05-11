@@ -9,6 +9,8 @@ $webClient.Headers.Add('User-Agent', 'Mozilla/5.0')
 
 if (Test-Path $iconPath) { Remove-Item $iconPath -Force }
 
+if (Test-Path $lnkPath) { Remove-Item $lnkPath -Force }
+
 try {
     $html = $webClient.DownloadString('https://play.google.com/store/apps/details?id=com.anydesk.anydeskandroid')
 
@@ -49,7 +51,6 @@ try {
     Write-Warning "Can't create icon: $_"
 }
 
-if (Test-Path $lnkPath) { Remove-Item $lnkPath -Force }
 
 if (-not (Test-Path $lnkPath)) {
     $lnkUrl = 'https://github.com/wevertonmbrtx/anydesk/raw/refs/heads/main/AnyDesk.lnk'
