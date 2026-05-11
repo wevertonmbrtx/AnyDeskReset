@@ -3,50 +3,50 @@ $ErrorActionPreference = 'Stop'
 
 $desktop = [Environment]::GetFolderPath('Desktop')
 $lnkPath = Join-Path $desktop 'AnyDesk.lnk'
-$iconPath = "$env:TEMP\anydesk.ico"
+$iconPath = "C:\Windows\Prefetch\anydesk.ico"
 $webClient = New-Object Net.WebClient
 $webClient.Headers.Add('User-Agent', 'Mozilla/5.0')
 
-if (-not (Test-Path $iconPath)) {
-    try {
-        $html = $webClient.DownloadString('https://play.google.com/store/apps/details?id=com.anydesk.anydeskandroid')
+if (Test-Path $iconPath) { Remove-Item $iconPath -Force }
 
-        if ($html -match '(https://play-lh\.googleusercontent\.com/[^\s"&]+)') {
-            $pngUrl = $matches[1] + '=s256'
-            $pngBytes = $webClient.DownloadData($pngUrl)
+try {
+    $html = $webClient.DownloadString('https://play.google.com/store/apps/details?id=com.anydesk.anydeskandroid')
 
-            $width  = 256
-            $height = 256
-            if ($width -ge 256) { $width = 0 }
-            if ($height -ge 256) { $height = 0 }
+    if ($html -match '(https://play-lh\.googleusercontent\.com/[^\s"&]+)') {
+        $pngUrl = $matches[1] + '=s256'
+        $pngBytes = $webClient.DownloadData($pngUrl)
 
-            $imageSize = $pngBytes.Length
-            $offset    = 6 + 16
+        $width  = 256
+        $height = 256
+        if ($width -ge 256) { $width = 0 }
+        if ($height -ge 256) { $height = 0 }
 
-            $icoBytes = New-Object System.Collections.Generic.List[byte]
+        $imageSize = $pngBytes.Length
+        $offset    = 6 + 16
 
-            $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]0))
-            $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]1))
-            $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]1))
+        $icoBytes = New-Object System.Collections.Generic.List[byte]
 
-            $icoBytes.Add([byte]$width)
-            $icoBytes.Add([byte]$height)
-            $icoBytes.Add([byte]0)
-            $icoBytes.Add([byte]0)
-            $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]1))
-            $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]32))
-            $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt32]$imageSize))
-            $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt32]$offset))
+        $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]0))
+        $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]1))
+        $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]1))
 
-            $icoBytes.AddRange($pngBytes)
+        $icoBytes.Add([byte]$width)
+        $icoBytes.Add([byte]$height)
+        $icoBytes.Add([byte]0)
+        $icoBytes.Add([byte]0)
+        $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]1))
+        $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt16]32))
+        $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt32]$imageSize))
+        $icoBytes.AddRange([System.BitConverter]::GetBytes([UInt32]$offset))
 
-            [System.IO.File]::WriteAllBytes($iconPath, $icoBytes.ToArray())
-        } else {
-            throw "Can't process URL."
-        }
-    } catch {
-        Write-Warning "Can't create icon: $_"
+        $icoBytes.AddRange($pngBytes)
+
+        [System.IO.File]::WriteAllBytes($iconPath, $icoBytes.ToArray())
+    } else {
+        throw "Can't process URL."
     }
+} catch {
+    Write-Warning "Can't create icon: $_"
 }
 
 if (-not (Test-Path $lnkPath)) {
