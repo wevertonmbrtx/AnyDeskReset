@@ -39,7 +39,6 @@ cls
     set cmdInvoke=1
     set winSysFolder=System32
     set "batchPath=%~f0"
-    set "choiceTxt=%TEMP%\adchoice.txt"
     set "service=AnyDesk"
     set "insPath0=%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe"
     set "insPath1=%ProgramFiles%\AnyDesk\AnyDesk.exe"
@@ -142,24 +141,10 @@ cls
     goto :eof
 
 :no_service
-    (
-        echo Set sh = CreateObject^("WScript.Shell"^)
-        echo msg = "AnyDesk is not installed." ^& vbCrLf ^& vbCrLf ^& "Yes - Install" ^& vbCrLf ^& "No - Portable" ^& vbCrLf ^& "Cancel - Exit"
-        echo CreateObject^("Scripting.FileSystemObject"^).CreateTextFile^("%choiceTxt%",1^).Write sh.Popup^(msg,0,"AnyDesk",3+32^)
-    ) > "%TEMP%\_ad.vbs"
-    cscript //nologo "%TEMP%\_ad.vbs" & del /f /q "%TEMP%\_ad.vbs" >nul 2>&1
-    set /p choice=<"%choiceTxt%"
-    del /f /q "%choiceTxt%" >nul 2>&1
-
-    if "%choice%"=="2" goto :eof
-
     echo Downloading "AnyDesk.exe"...
     call :download
     if errorlevel 1 goto :eof
 
-    if "%choice%"=="6" goto do_install
-
-:do_portable
     echo Executing portable version...
     start "" /wait "%porPath0%"
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
@@ -169,15 +154,6 @@ cls
     rd /s /q "%APPDATA%\AnyDesk" 2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk" 2>nul
     echo Success.
-    goto :eof
-
-:do_install
-    echo Installing AnyDesk...
-    start "" /wait "%porPath0%" --install "%ProgramFiles(x86)%\AnyDesk" --silent
-    timeout /t 5 >nul
-    del /f /q "%porPath0%" 2>nul
-    del /f /q "%TEMP%\gcapi.dll" 2>nul
-    echo Done. AnyDesk installed.
     goto :eof
 
 :download
