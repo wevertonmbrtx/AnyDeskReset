@@ -151,6 +151,10 @@ cls
     timeout /t 2 >nul
     del /f /q "%porPath0%" 2>nul
     del /f /q "%TEMP%\gcapi.dll" 2>nul
+
+    sc query "%service%" >nul 2>&1
+    if not errorlevel 1 goto main
+
     rd /s /q "%APPDATA%\AnyDesk" 2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk" 2>nul
     echo Success.
