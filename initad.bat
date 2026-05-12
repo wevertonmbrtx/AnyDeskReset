@@ -85,9 +85,12 @@ cls
     goto main
 
 :main
+    set "_exe="
+    if exist "%insPath0%" set "_exe=%insPath0%"
+    if not defined _exe if exist "%insPath1%" set "_exe=%insPath1%"
+    if not defined _exe goto no_service
     sc query "%service%" >nul 2>&1
     if errorlevel 1 goto no_service
-    if not exist "%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe" if not exist "%ProgramFiles%\AnyDesk\AnyDesk.exe" goto no_service
     del /f /q "%porPath0%" >nul 2>&1
 
     echo Stopping AnyDesk...
@@ -121,21 +124,10 @@ cls
 :open_gui
     if exist "%TEMP%\anydesk_user.conf" move /y "%TEMP%\anydesk_user.conf" "%APPDATA%\AnyDesk\user.conf" >nul 2>&1
 
-    set "_exe="
-    if exist "%insPath0%" set "_exe=%insPath0%"
-    if not defined _exe if exist "%insPath1%" set "_exe=%insPath1%"
-    if not defined _exe (
-        cls
-        echo Error: "AnyDesk.exe" not found.
-        pause >nul
-        goto :eof
-    )
-
     sc stop "%service%" >nul 2>&1
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
     start "" /wait "%_exe%"
-
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     echo Success.
     goto :eof
@@ -151,10 +143,6 @@ cls
     timeout /t 2 >nul
     del /f /q "%porPath0%" 2>nul
     del /f /q "%TEMP%\gcapi.dll" 2>nul
-
-    sc query "%service%" >nul 2>&1
-    if not errorlevel 1 goto main
-
     rd /s /q "%APPDATA%\AnyDesk" 2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk" 2>nul
     echo Success.
