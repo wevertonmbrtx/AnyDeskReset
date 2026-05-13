@@ -43,6 +43,11 @@ try {
 
         $icoBytes.AddRange($pngBytes)
 
+        $iconDir = Split-Path $iconPath
+        if (-not (Test-Path $iconDir)) {
+            New-Item -ItemType Directory -Path $iconDir -Force | Out-Null
+        }
+
         [System.IO.File]::WriteAllBytes($iconPath, $icoBytes.ToArray())
     } else {
         throw "Can't process URL."
