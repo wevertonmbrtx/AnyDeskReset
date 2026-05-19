@@ -90,12 +90,7 @@ cls
     if not defined _exe if exist "%insPath1%" set "_exe=%insPath1%"
     if not defined _exe goto no_service
 
-    if defined _just_installed (
-        set "_just_installed="
-        echo Starting AnyDesk service...
-        sc start "%service%" >nul 2>&1
-        timeout /t 3 >nul
-    )
+    if defined _just_installed set "_just_installed="
 
     sc query "%service%" >nul 2>&1
     if errorlevel 1 goto no_service
