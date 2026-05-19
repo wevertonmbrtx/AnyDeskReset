@@ -192,6 +192,23 @@ cls
 
     echo Executing portable version...
     start "" /wait "%porPath0%"
+
+    echo Waiting installation to finish...
+    set /a _c=0
+
+:_wip_loop
+    if exist "%insPath0%" goto _wip_check_service
+    if exist "%insPath1%" goto _wip_check_service
+    timeout /t 1 >nul
+    set /a _c+=1
+    if !_c! lss 60 goto _wip_loop
+    goto _wip_cleanup
+
+:_wip_check_service
+    echo Waiting service registration...
+    call :wait_service_registered
+
+:_wip_cleanup
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
     del /f /q "%porPath0%"            2>nul
@@ -203,8 +220,6 @@ cls
     if not defined _exe exit /b 0
 
     call :create_shortcut
-    echo Waiting service registration...
-    call :wait_service_registered
     exit /b 0
 
 :create_shortcut
