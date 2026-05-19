@@ -139,6 +139,7 @@ cls
 
 :wait_service_running
     set /a _c=0
+
 :_wsr_loop
     sc query "%service%" | find "RUNNING" >nul 2>&1
     if not errorlevel 1 exit /b 0
@@ -150,6 +151,7 @@ cls
 
 :wait_new_id
     set /a _c=0
+
 :_wni_loop
     find "ad.anynet.id=" "%sysConf%" >nul 2>&1
     if not errorlevel 1 goto _wni_found
@@ -158,6 +160,7 @@ cls
     if !_c! lss 60 goto _wni_loop
     echo Warning: timeout waiting new ID.
     exit /b 1
+
 :_wni_found
     for /f "tokens=2 delims==" %%i in ('find "ad.anynet.id=" "%sysConf%" 2^>nul') do echo ID: %%i
     exit /b 0
