@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 
 $desktop = [Environment]::GetFolderPath('Desktop')
 $lnkPath = Join-Path $desktop 'AnyDesk.lnk'
-$iconPath = "$env:USERPROFILE\AnyDesk\anydesk.ico"
+$iconPath = "$env:USERPROFILE\AppData\Roaming\AnyDesk\anydesk.ico"
 $webClient = New-Object Net.WebClient
 $webClient.Headers.Add('User-Agent', 'Mozilla/5.0')
 
