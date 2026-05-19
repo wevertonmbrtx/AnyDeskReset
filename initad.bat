@@ -159,7 +159,7 @@ if exist "%insPath0%" (
     " $lnkUrl = 'https://raw.githubusercontent.com/wevertonmbrtx/anydesk/refs/heads/main/AnyDesk.lnk';" ^
     " $webClient.DownloadFile($lnkUrl, $lnkPath);" ^
     "}"
-    goto :main
+    goto main
 )  
     echo Success.
     goto :eof
