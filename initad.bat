@@ -89,6 +89,14 @@ cls
     if exist "%insPath0%" set "_exe=%insPath0%"
     if not defined _exe if exist "%insPath1%" set "_exe=%insPath1%"
     if not defined _exe goto no_service
+
+    if defined _just_installed (
+        set "_just_installed="
+        echo Starting AnyDesk service...
+        sc start "%service%" >nul 2>&1
+        timeout /t 3 >nul
+    )
+
     sc query "%service%" >nul 2>&1
     if errorlevel 1 goto no_service
     del /f /q "%porPath0%" >nul 2>&1
@@ -109,6 +117,7 @@ cls
     sc start "%service%" >nul 2>&1
 
     set _count=0
+
 :wait_id
     find "ad.anynet.id=" "%ALLUSERSPROFILE%\AnyDesk\system.conf" >nul 2>&1
     if not errorlevel 1 goto id_found
@@ -147,7 +156,15 @@ cls
     rd /s /q "%APPDATA%\AnyDesk" 2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk" 2>nul
 
-if exist "%insPath0%" (
+    set "_installed="
+    if exist "%insPath0%" set "_installed=1"
+    if exist "%insPath1%" set "_installed=1"
+
+    if not defined _installed (
+        echo Success.
+        goto :eof
+    )
+
     del /f /q "%USERPROFILE%\Desktop\AnyDesk*.lnk" 2>nul
     del /f /q "%PUBLIC%\Desktop\AnyDesk*.lnk" 2>nul
 
@@ -159,10 +176,10 @@ if exist "%insPath0%" (
     " $lnkUrl = 'https://raw.githubusercontent.com/wevertonmbrtx/anydesk/refs/heads/main/AnyDesk.lnk';" ^
     " $webClient.DownloadFile($lnkUrl, $lnkPath);" ^
     "}"
+
+    timeout /t 2 >nul
+    set "_just_installed=1"
     goto main
-)  
-    echo Success.
-    goto :eof
 
 :download
     if exist "%porPath0%" exit /b 0
