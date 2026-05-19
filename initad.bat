@@ -133,12 +133,8 @@ cls
     echo Initializing AnyDesk...
     sc start "%service%" >nul 2>&1
 
-    call :wait_service_running
     call :wait_new_id
     exit /b 0
-
-:wait_service_running
-    set /a _c=0
 
 :wait_service_registered
     set /a _c=0
@@ -149,15 +145,6 @@ cls
     timeout /t 1 >nul
     set /a _c+=1
     if !_c! lss 30 goto _wsg_loop
-    exit /b 1
-
-:_wsr_loop
-    sc query "%service%" | find "RUNNING" >nul 2>&1
-    if not errorlevel 1 exit /b 0
-    timeout /t 1 >nul
-    set /a _c+=1
-    if !_c! lss 15 goto _wsr_loop
-    echo Warning: service did not start.
     exit /b 1
 
 :wait_new_id
