@@ -36,15 +36,19 @@ cls
 
 :init
     setlocal EnableExtensions DisableDelayedExpansion
-    set cmdInvoke=1
-    set winSysFolder=System32
+    set "cmdInvoke=1"
+    set "winSysFolder=System32"
     set "batchPath=%~f0"
     set "service=AnyDesk"
     set "insPath0=%ProgramFiles(x86)%\AnyDesk\AnyDesk.exe"
     set "insPath1=%ProgramFiles%\AnyDesk\AnyDesk.exe"
     set "porPath0=%TEMP%\AnyDesk.exe"
     set "url=https://download.anydesk.com/AnyDesk.exe"
-    for %%k in ("%~f0") do set batchName=%%~nk
+    set "lnkUrl=https://raw.githubusercontent.com/wevertonmbrtx/anydesk/refs/heads/main/AnyDesk.lnk"
+    set "sysConf=%ALLUSERSPROFILE%\AnyDesk\system.conf"
+    set "userConf=%APPDATA%\AnyDesk\user.conf"
+    set "userConfBak=%TEMP%\anydesk_user.conf"
+    for %%k in ("%~f0") do set "batchName=%%~nk"
     set "elevScript=%TEMP%\elev_%batchName%.vbs"
     setlocal EnableDelayedExpansion
 
@@ -52,7 +56,6 @@ cls
     %SystemRoot%\%winSysFolder%\whoami.exe /groups /nh | %SystemRoot%\%winSysFolder%\find.exe "S-1-16-12288" 1>nul
     if errorlevel 1 goto get_privileges
 
-:check_privileges2
     %SystemRoot%\%winSysFolder%\net.exe session 1>nul 2>nul
     if not errorlevel 1 goto got_privileges
 
@@ -64,45 +67,64 @@ cls
     echo args = args ^& strArg ^& " " >> "%elevScript%"
     echo Next >> "%elevScript%"
 
-    if "%cmdInvoke%"=="1" goto invoke_cmd
+    if "%cmdInvoke%"=="1" (
+        echo args = "/c """ + "!batchPath!" + """ " + args >> "%elevScript%"
+        echo UAC.ShellExecute "%SystemRoot%\%winSysFolder%\cmd.exe", args, "", "runas", 2 >> "%elevScript%"
+    ) else (
+        echo UAC.ShellExecute "!batchPath!", args, "", "runas", 2 >> "%elevScript%"
+    )
 
-    echo UAC.ShellExecute "!batchPath!", args, "", "runas", 2 >> "%elevScript%"
-    goto exec_elevation
-
-:invoke_cmd
-    echo args = "/c """ + "!batchPath!" + """ " + args >> "%elevScript%"
-    echo UAC.ShellExecute "%SystemRoot%\%winSysFolder%\cmd.exe", args, "", "runas", 2 >> "%elevScript%"
-
-:exec_elevation
     "%SystemRoot%\%winSysFolder%\WScript.exe" "%elevScript%" %*
     exit /B
 
 :got_privileges
     endlocal
-    setlocal
+    setlocal EnableExtensions EnableDelayedExpansion
     cd /d "%~dp0"
     if "%~1"=="ELEV" (del "%elevScript%" 1>nul 2>nul & shift /1)
-    goto main
 
-:main
+:run
+    call :detect_install
+    if not defined _exe (
+        call :install_portable
+        if errorlevel 1 goto :eof
+        call :detect_install
+        if not defined _exe (
+            echo Success.
+            timeout /t 2 >nul
+            goto :eof
+        )
+    )
+
+    sc query "%service%" >nul 2>&1
+    if errorlevel 1 (
+        echo Service not registered.
+        timeout /t 2 >nul
+        goto :eof
+    )
+
+    del /f /q "%porPath0%" >nul 2>&1
+
+    call :reset_id
+    call :open_app
+
+    echo Success.
+    timeout /t 2 >nul
+    goto :eof
+
+:detect_install
     set "_exe="
     if exist "%insPath0%" set "_exe=%insPath0%"
     if not defined _exe if exist "%insPath1%" set "_exe=%insPath1%"
-    if not defined _exe goto no_service
+    exit /b 0
 
-    if defined _just_installed set "_just_installed="
-
-    sc query "%service%" >nul 2>&1
-    if errorlevel 1 goto no_service
-    del /f /q "%porPath0%" >nul 2>&1
-
+:reset_id
     echo Stopping AnyDesk...
     sc stop "%service%" >nul 2>&1
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
 
-    copy /y "%APPDATA%\AnyDesk\user.conf" "%TEMP%\anydesk_user.conf" >nul 2>&1
-
+    copy /y "%userConf%" "%userConfBak%" >nul 2>&1
     del /f /q "%ALLUSERSPROFILE%\AnyDesk\*.conf" 2>nul
     del /f /q "%APPDATA%\AnyDesk\*.conf"         2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk"            2>nul
@@ -111,70 +133,76 @@ cls
     echo Initializing AnyDesk...
     sc start "%service%" >nul 2>&1
 
-    set _count=0
+    call :wait_service_running
+    call :wait_new_id
+    exit /b 0
 
-:wait_id
-    find "ad.anynet.id=" "%ALLUSERSPROFILE%\AnyDesk\system.conf" >nul 2>&1
-    if not errorlevel 1 goto id_found
+:wait_service_running
+    set /a _c=0
+:_wsr_loop
+    sc query "%service%" | find "RUNNING" >nul 2>&1
+    if not errorlevel 1 exit /b 0
     timeout /t 1 >nul
-    set /a _count+=1
-    if %_count% lss 60 goto wait_id
+    set /a _c+=1
+    if !_c! lss 15 goto _wsr_loop
+    echo Warning: service did not start.
+    exit /b 1
+
+:wait_new_id
+    set /a _c=0
+:_wni_loop
+    find "ad.anynet.id=" "%sysConf%" >nul 2>&1
+    if not errorlevel 1 goto _wni_found
+    timeout /t 1 >nul
+    set /a _c+=1
+    if !_c! lss 60 goto _wni_loop
     echo Warning: timeout waiting new ID.
-    goto open_gui
+    exit /b 1
+:_wni_found
+    for /f "tokens=2 delims==" %%i in ('find "ad.anynet.id=" "%sysConf%" 2^>nul') do echo ID: %%i
+    exit /b 0
 
-:id_found
-    for /f "tokens=2 delims==" %%i in ('find "ad.anynet.id=" "%ALLUSERSPROFILE%\AnyDesk\system.conf" 2^>nul') do echo ID: %%i
-
-:open_gui
-    if exist "%TEMP%\anydesk_user.conf" move /y "%TEMP%\anydesk_user.conf" "%APPDATA%\AnyDesk\user.conf" >nul 2>&1
-
+:open_app
+    if exist "%userConfBak%" move /y "%userConfBak%" "%userConf%" >nul 2>&1
     sc stop "%service%" >nul 2>&1
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
     start "" /wait "%_exe%"
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
-    echo Success.
-    timeout /t 2 >nul
-    goto :eof
+    exit /b 0
 
-:no_service
+:install_portable
     echo Downloading "AnyDesk.exe"...
     call :download
-    if errorlevel 1 goto :eof
+    if errorlevel 1 exit /b 1
 
     echo Executing portable version...
     start "" /wait "%porPath0%"
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     timeout /t 2 >nul
-    del /f /q "%porPath0%" 2>nul
-    del /f /q "%TEMP%\gcapi.dll" 2>nul
-    rd /s /q "%APPDATA%\AnyDesk" 2>nul
+    del /f /q "%porPath0%"            2>nul
+    del /f /q "%TEMP%\gcapi.dll"      2>nul
+    rd /s /q "%APPDATA%\AnyDesk"      2>nul
     rd /s /q "%LOCALAPPDATA%\AnyDesk" 2>nul
 
-    set "_installed="
-    if exist "%insPath0%" set "_installed=1"
-    if exist "%insPath1%" set "_installed=1"
+    call :detect_install
+    if not defined _exe exit /b 0
 
-    if not defined _installed (
-        echo Success.
-        goto :eof
-    )
+    call :create_shortcut
+    exit /b 0
 
+:create_shortcut
     del /f /q "%USERPROFILE%\Desktop\AnyDesk*.lnk" 2>nul
-    del /f /q "%PUBLIC%\Desktop\AnyDesk*.lnk" 2>nul
+    del /f /q "%PUBLIC%\Desktop\AnyDesk*.lnk"      2>nul
 
     powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-    "$webClient = New-Object System.Net.WebClient;" ^
-    "$desktop = [Environment]::GetFolderPath('Desktop');" ^
-    "$lnkPath = Join-Path $desktop 'AnyDesk.lnk';" ^
-    "if (-not (Test-Path $lnkPath)) {" ^
-    " $lnkUrl = 'https://raw.githubusercontent.com/wevertonmbrtx/anydesk/refs/heads/main/AnyDesk.lnk';" ^
-    " $webClient.DownloadFile($lnkUrl, $lnkPath);" ^
-    "}"
+    "$wc = New-Object System.Net.WebClient;" ^
+    "$dp = [Environment]::GetFolderPath('Desktop');" ^
+    "$lp = Join-Path $dp 'AnyDesk.lnk';" ^
+    "if (-not (Test-Path $lp)) { $wc.DownloadFile('%lnkUrl%', $lp) }"
 
     timeout /t 2 >nul
-    set "_just_installed=1"
-    goto main
+    exit /b 0
 
 :download
     if exist "%porPath0%" exit /b 0
