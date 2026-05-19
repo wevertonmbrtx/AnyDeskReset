@@ -140,6 +140,17 @@ cls
 :wait_service_running
     set /a _c=0
 
+:wait_service_registered
+    set /a _c=0
+
+:_wsg_loop
+    sc query "%service%" >nul 2>&1
+    if not errorlevel 1 exit /b 0
+    timeout /t 1 >nul
+    set /a _c+=1
+    if !_c! lss 30 goto _wsg_loop
+    exit /b 1
+
 :_wsr_loop
     sc query "%service%" | find "RUNNING" >nul 2>&1
     if not errorlevel 1 exit /b 0
@@ -192,6 +203,8 @@ cls
     if not defined _exe exit /b 0
 
     call :create_shortcut
+    echo Waiting service registration...
+    call :wait_service_registered
     exit /b 0
 
 :create_shortcut
