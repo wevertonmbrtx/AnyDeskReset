@@ -130,6 +130,7 @@ cls
     start "" /wait "%_exe%"
     taskkill /f /im "AnyDesk.exe" >nul 2>&1
     echo Success.
+    timeout /t 2 >nul
     goto :eof
 
 :no_service
