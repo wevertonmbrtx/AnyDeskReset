@@ -149,13 +149,14 @@ cls
 
     if exist "%insPath0%" (
         del /f /q "%USERPROFILE%\Desktop\AnyDesk*.lnk" 2>nul
+        del /f /q "%PUBLIC%\Desktop\AnyDesk*.lnk" 2>nul
     
         powershell -NoProfile -ExecutionPolicy Bypass -Command ^
             "$webClient = New-Object System.Net.WebClient;" ^
             "$desktop = [Environment]::GetFolderPath('Desktop');" ^
             "$lnkPath = Join-Path $desktop 'AnyDesk.lnk';" ^
             "if (-not (Test-Path $lnkPath)) {" ^
-            "    $lnkUrl = 'https://github.com';" ^
+            "    $lnkUrl = 'https://raw.githubusercontent.com/wevertonmbrtx/anydesk/refs/heads/main/AnyDesk.lnk';" ^
             "    $webClient.DownloadFile($lnkUrl, $lnkPath);" ^
             "}"
     )
